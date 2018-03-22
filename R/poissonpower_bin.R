@@ -2,10 +2,10 @@
 #' Sample size and power for Poisson regression.
 #'
 #' A function for calculating sample size and power based on Poisson regression. The function solves for one of the following: alpha, power, incidence rate ratio, N.
-#' @param alpha alpha level (usually 0.05). Can range from 0 to 1
-#' @param power 1 - Pr(type II error) (usually 0.80). Can range from 0 to 1.
+#' @param alpha type I error rate. Can range from 0 to 1 (typically 0.05)
+#' @param power 1 - Pr(type II error) Can range from 0 to 1 (typically 0.80)
 #' @param exp.B0 Baseline rate. The response rate when all covariates have a value of 0
-#' @param exp.B1 Incidence rate ratio (IRR). Also can be called the IRR.
+#' @param exp.B1 Incidence rate ratio (IRR).
 #' @param muT Mean exposure time
 #' @param phi Measure of over-dispersion
 #' @param R2 The square of the multiple correlation coefficient when the covariate of interst is regressed on the other covariates.
