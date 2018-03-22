@@ -1,24 +1,24 @@
 
 #' Sample size and power for Poisson regression.
 #'
-#' A function for calculating sample size and power based on Poisson regression. The function solves for one of the following: alpha, power, incidence rate ratio, N.
+#' Calculating power/sample size for simple Poisson regression with a binary predictor. The function solves for one of the following: alpha, power, incidence rate ratio, N.
 #' @param alpha type I error rate. Can range from 0 to 1 (typically 0.05)
 #' @param power 1 - Pr(type II error) Can range from 0 to 1 (typically 0.80)
 #' @param exp.B0 Baseline rate. The response rate when all covariates have a value of 0
-#' @param exp.B1 Incidence rate ratio (IRR).
+#' @param exp.B1 Incidence rate ratio (IRR) comparing X=1 to X=0.
 #' @param muT Mean exposure time
 #' @param phi Measure of over-dispersion
 #' @param R2 The square of the multiple correlation coefficient when the covariate of interst is regressed on the other covariates.
-#' @param pi.x1 Percent of N with X1=1
+#' @param pi.x1 proportion of sample (N) with X1=1
 #' @param N sample size
 #' @return Return one of the following parameters
-#' @return \code{alpha}
-#' @return \code{power}
-#' @return \code{exp.B1}
-#' @return \code{N}
+#' @return \code{alpha}, \code{power}, \code{exp.B1}, \code{N}
 #' @note The test is a two-sided test. For one-sided tests, double the significance level. For example, you can set alpha=0.10 to obtain one-sided test at 0.05 significance level.
+#' @note \code{alpha}, \code{power}, \code{exp.B0}, \code{exp.B1}, \code{pi.x1}, \code{N} can be input as either single values or vectors. Only one parameter can be input as a vector.
 #' @author David Aaby <david.aaby@@northwestern.edu>
 #' @references Signorini, D. 1991. Sample Size for Poisson Regression, Biometrika (1991), 78, 2, pages 446-450..
+#' @export Poissonpower.bin
+#' @import stats
 #' @examples
 #' Poissonpower.bin(alpha=NULL, power=.80, exp.B0=.85, exp.B1=1.3, muT=1, phi=1,R2=0, pi.x1=.5, N=406)
 #' Poissonpower.bin(alpha=NULL, power=.80, exp.B0=.85, exp.B1=1.3, muT=1, phi=1, R2=0, pi.x1=.5, N=406)
@@ -69,10 +69,9 @@ Poissonpower.bin <- function(alpha=NULL, power=NULL, exp.B0=NULL, exp.B1=NULL, m
     A3 = sqrt(var.beta1.0)
     A4 = (A1 - A2) / A3
 
-    alpha = 2*(1-stats::pnorm(A4))     # two-sided test
-    #alpha = (1-stats::pnorm(A4))       # one-sided test
+    alpha = 2*(1-stats::pnorm(A4))
 
-    # output results #
+
     results = NULL
 
     if(length(power) > 1 | length(exp.B0) > 1 | length(exp.B1) > 1 | length(pi.x1) > 1 | length(N) > 1)  {
@@ -107,16 +106,14 @@ Poissonpower.bin <- function(alpha=NULL, power=NULL, exp.B0=NULL, exp.B1=NULL, m
     var.beta1.B1 =  (1 / (1-pi.x1)) + (1 / (pi.x1*exp.B1))
 
     A1 = sqrt((N * muT * exp.B0 * (B1^2) * (1-R2)) / phi)
-    A2 = stats::qnorm(1-alpha/2) * sqrt(var.beta1.0)    # two-sided test
-    #A2 = stats::qnorm(1-alpha) * sqrt(var.beta1.0)      # one-sided test
+    A2 = stats::qnorm(1-alpha/2) * sqrt(var.beta1.0)
 
     A3 = sqrt(var.beta1.B1)
     A4 = (A1 - A2) / A3
 
-    power = stats::pnorm(A4)     # two-sided test
+    power = stats::pnorm(A4)
 
 
-    # output results #
     results = NULL
 
     if(length(alpha) > 1 | length(exp.B0) > 1 | length(exp.B1) > 1 | length(pi.x1) > 1 | length(N) > 1)  {
@@ -150,8 +147,7 @@ Poissonpower.bin <- function(alpha=NULL, power=NULL, exp.B0=NULL, exp.B1=NULL, m
     var.beta1.0 = 1 / var.x1
     var.beta1.B1 =  (1 / (1-pi.x1)) + (1 / (pi.x1*exp.B1))
 
-    A1 = stats::qnorm(1-alpha/2) * sqrt(var.beta1.0)     # two-sided test
-    #A1 = stats::qnorm(1-alpha) * sqrt(var.beta1.0)     # one-sided test
+    A1 = stats::qnorm(1-alpha/2) * sqrt(var.beta1.0)
     A2 = stats::qnorm(1-beta) * sqrt(var.beta1.B1)
     A3 =  muT * exp.B0 * (B1^2) * (1-R2)
 
@@ -159,8 +155,6 @@ Poissonpower.bin <- function(alpha=NULL, power=NULL, exp.B0=NULL, exp.B1=NULL, m
     N = ceiling(N)
 
 
-
-    # output results #
     results = NULL
 
     if(length(alpha) > 1 | length(power) > 1 | length(exp.B0) > 1 | length(exp.B1) > 1 | length(pi.x1) > 1) {
@@ -324,7 +318,6 @@ Poissonpower.bin <- function(alpha=NULL, power=NULL, exp.B0=NULL, exp.B1=NULL, m
       }
     }
 
-    # output results #
     results = NULL
 
     if(length(alpha) > 1 | length(power) > 1 | length(exp.B0) > 1 | length(pi.x1) > 1 | length(N) > 1)  {
