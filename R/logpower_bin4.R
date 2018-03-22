@@ -1,7 +1,7 @@
 
 #' Sample size and power for logistic regression with a binary covariate.
 #'
-#' A function for calculating sample size and power based on logistic regression. The function solves for one of the following: alpha, power, OR, N. Assume the predictor is binary.
+#' Calculating power/sample size for simple logistic regression with a binary predictor. The function solves for one of the following: alpha, power, OR, N.
 #' @param alpha type I error rate. Can range from 0 to 1 (typically 0.05)
 #' @param power 1 - Pr(type II error) Can range from 0 to 1 (typically 0.80)
 #' @param P0 baseline probability that Y=1
@@ -11,6 +11,7 @@
 #' @return Return one of the following parameters
 #' @return \code{alpha}, \code{power}, \code{OR}, \code{N}
 #' @note The test is a two-sided test. For one-sided tests, double the significance level. For example, you can set alpha=0.10 to obtain one-sided test at 0.05 significance level.
+#' @note \code{alpha}, \code{power}, \code{P0}, \code{OR}, \code{N} can be input as either single values or vectors. Only one parameter can be input as a vector.
 #' @author David Aaby <david.aaby@@northwestern.edu>
 #' @references Hsieh, F.Y., Block, D.A., and Larsen, M.D. 1998. A Simple Method of Sample Size Calculation for Linear and Logistic Regression, Statistics in Medicine, Volume 17, pages 1623-1634.
 #' @export Logpower.bin
@@ -26,6 +27,8 @@
 
 Logpower.bin <- function(alpha=NULL, power=NULL, P0=NULL, OR=NULL, R=NULL, N=NULL) {
 
+
+  # error messages #
   if(any(alpha < 0 | alpha > 1)) stop('alpha not between 0 and 1')
   if(any(power < 0 | power > 1)) stop('power not between 0 and 1')
   if(any(P0 < 0 | P0 > 1))       stop('P0 not between 0 and 1')
@@ -38,7 +41,7 @@ Logpower.bin <- function(alpha=NULL, power=NULL, P0=NULL, OR=NULL, R=NULL, N=NUL
   if(length(l.mylist[l.mylist>=2]) > 1) stop('Only vary one parameter at a time')
 
 
-
+  # solve for alpha level #
   if(is.null(alpha)) {
     beta = 1 - power
     P1 = (P0*OR) / (OR*P0 + 1 - P0)
@@ -73,6 +76,7 @@ Logpower.bin <- function(alpha=NULL, power=NULL, P0=NULL, OR=NULL, R=NULL, N=NUL
   }
 
 
+  # solve for power #
   if(is.null(power)) {
 
     P1 = (P0*OR) / (OR*P0 + 1 - P0)
@@ -107,6 +111,45 @@ Logpower.bin <- function(alpha=NULL, power=NULL, P0=NULL, OR=NULL, R=NULL, N=NUL
   }
 
 
+  # solve for N #
+  if(is.null(N)) {
+
+    beta = 1 - power
+
+
+    P1 = (P0*OR) / (OR*P0 + 1 - P0)
+
+
+    Pbar = (1-R)*P0 + R*P1
+
+    A1 = stats::qnorm(1-alpha/2)* sqrt(Pbar*(1-Pbar)/R)
+    A2 = stats::qnorm(1-beta)*sqrt(P0*(1-P0) + ((P1*(1-P1)*(1-R))/R))
+    A3 = ((P0-P1)^2) * (1-R)
+
+    N = ((A1 + A2)^2) / A3
+    N = ceiling(N)
+
+    P1 = round(P1,3)
+
+
+    results = NULL
+
+    if(length(alpha) > 1 | length(power) > 1 | length(P0) > 1 | length(OR) > 1) {
+      rownum = max(length(alpha), length(power), length(P0), length(OR))
+      for(i in 1:rownum) {
+        results = cbind(alpha, power, P0, P1, OR, R, N)
+      }
+    }
+
+    else {
+      results = c(alpha, power, P0, P1, OR, R, N)
+      results = data.frame(results)
+      results = t(results)
+      colnames(results) = c("alpha", "power", "P0", "P1", "OR", "R" ,"N")
+    }
+  }
+
+  # solve for odds ratio #
   if(is.null(OR)) {
 
     beta = 1 - power
@@ -245,45 +288,6 @@ Logpower.bin <- function(alpha=NULL, power=NULL, P0=NULL, OR=NULL, R=NULL, N=NUL
 
     else {
       results = c(alpha, power, P0, P1.new, OR, R, N)
-      results = data.frame(results)
-      results = t(results)
-      colnames(results) = c("alpha", "power", "P0", "P1", "OR", "R" ,"N")
-    }
-  }
-
-
-
-  if(is.null(N)) {
-
-    beta = 1 - power
-
-
-    P1 = (P0*OR) / (OR*P0 + 1 - P0)
-
-
-    Pbar = (1-R)*P0 + R*P1
-
-    A1 = stats::qnorm(1-alpha/2)* sqrt(Pbar*(1-Pbar)/R)
-    A2 = stats::qnorm(1-beta)*sqrt(P0*(1-P0) + ((P1*(1-P1)*(1-R))/R))
-    A3 = ((P0-P1)^2) * (1-R)
-
-    N = ((A1 + A2)^2) / A3
-    N = ceiling(N)
-
-    P1 = round(P1,3)
-
-
-    results = NULL
-
-    if(length(alpha) > 1 | length(power) > 1 | length(P0) > 1 | length(OR) > 1) {
-      rownum = max(length(alpha), length(power), length(P0), length(OR))
-      for(i in 1:rownum) {
-        results = cbind(alpha, power, P0, P1, OR, R, N)
-      }
-    }
-
-    else {
-      results = c(alpha, power, P0, P1, OR, R, N)
       results = data.frame(results)
       results = t(results)
       colnames(results) = c("alpha", "power", "P0", "P1", "OR", "R" ,"N")

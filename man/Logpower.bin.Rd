@@ -26,10 +26,12 @@ Return one of the following parameters
 \code{alpha}, \code{power}, \code{OR}, \code{N}
 }
 \description{
-A function for calculating sample size and power based on logistic regression. The function solves for one of the following: alpha, power, OR, N. Assume the predictor is binary.
+Calculating power/sample size for simple logistic regression with a binary predictor. The function solves for one of the following: alpha, power, OR, N.
 }
 \note{
 The test is a two-sided test. For one-sided tests, double the significance level. For example, you can set alpha=0.10 to obtain one-sided test at 0.05 significance level.
+
+\code{alpha}, \code{power}, \code{P0}, \code{OR}, \code{N} can be input as either single values or vectors. Only one parameter can be input as a vector.
 }
 \examples{
 Logpower.bin(alpha=0.05, power=.90, P0=0.07, OR=1.5, R=.50)            #outputs N
