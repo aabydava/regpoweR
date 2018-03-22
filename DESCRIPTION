@@ -1,0 +1,14 @@
+Package: regpoweR
+Type: Package
+Title: Power and Sample Size Calculation for Logistic and Poisson Regression
+Version: 0.1.0
+Author: David Aaby
+Maintainer: David Aaby <david.aaby@northwestern.edu>
+Description: Power and sample size calculations for logistic and Poisson regression.
+    For logistic regression, functions can solve for alpha, power, sample size (N), or minimum detectable odds ratio.
+    For Poisson regression, functions can solve for alpha, power, sample size (N), or minimum detecatable incidence rate ratio.
+License: GPL-3
+LazyData: TRUE
+RoxygenNote: 6.0.1
+Imports:
+    stats
